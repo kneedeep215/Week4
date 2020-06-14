@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 The following files are included in this assignment:  
-# Codebook_run_analysis.html
-This file contains a description of the processing steps that were conducted as part of this assignment. Each step is shown in order with the variables that were created and/or modified during the step. The original Zip files remain unaltered from the original download on 6/14/2020.  
+# Codebook_run_analysis.rmd
+This file contains a description of the processing steps that were conducted as part of this assignment. Each step is shown in order with the variables that were created and/or modified during the step. The original Zip files remain unaltered from the original download on 6/14/2020. There is also a version of the file in HTML which may be used to view in a browser for ease of reading. 
 # run_analysis.R  
 This file containst the R scripts used to complete the assignment. Each step corresponds to a section in the codebook.
