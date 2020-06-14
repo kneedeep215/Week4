@@ -1,0 +1,64 @@
+##Preparing environment and files 
+library(dplyr)
+if(!file.exists("./data")){dir.create("./data")}
+fileURL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+download.file(fileURL, destfile="./data/week4project.zip", method="curl")
+unzip("./data/week4project.zip", exdir="C:/Users/Chris/Documents/R/Week4Final/data")
+
+##Assign file location for each file in the original zip
+UCIfeature <- "C:/Users/Chris/Documents/R/Week4Final/data/UCI HAR Dataset/features.txt"
+UCIactivities <- "C:/Users/Chris/Documents/R/Week4Final/data/UCI HAR Dataset/activity_labels.txt"
+UCIsubjtest <- "C:/Users/Chris/Documents/R/Week4Final/data/UCI HAR Dataset/test/subject_test.txt"
+UCIXTest <- "C:/Users/Chris/Documents/R/Week4Final/data/UCI HAR Dataset/test/X_test.txt"
+UCIYTest <- "C:/Users/Chris/Documents/R/Week4Final/data/UCI HAR Dataset/test/Y_test.txt"
+UCIsubjtrain <- "C:/Users/Chris/Documents/R/Week4Final/data/UCI HAR Dataset/train/subject_train.txt"
+UCIXTrain <- "C:/Users/Chris/Documents/R/Week4Final/data/UCI HAR Dataset/train/X_train.txt"
+UCIYTrain <- "C:/Users/Chris/Documents/R/Week4Final/data/UCI HAR Dataset/train/Y_train.txt"
+
+##Populate Data Frames
+##global data frames
+df_features <- read.table(UCIfeature, col.names = c("n","functions"))
+df_activities <- read.table(UCIactivities, col.names = c("activity_name", "activity"))
+
+##test data frames
+df_subjtest <- read.table(UCIsubjtest, col.names = "subject")
+df_xtest <- read.table(UCIXTest, col.names = df_features$functions)
+df_ytest <- read.table(UCIYTest, col.names = "activity_name")
+
+##training data frames
+df_subjtrain <- read.table(UCIsubjtrain, col.names = "subject")
+df_xtrain <- read.table(UCIXTrain, col.names = df_features$functions)
+df_ytrain <- read.table(UCIYTrain, col.names = "activity_name")
+
+#merge datasets - TASK 1 in Assignment
+mergedx <- rbind(df_xtest, df_xtrain)
+mergedy <- rbind(df_ytest, df_ytrain)
+mergedsubj <- rbind(df_subjtest, df_subjtrain)
+mergedall <- cbind(mergedsubj, mergedy, mergedx)
+
+##create tidy data frame and extract the mean and standard deviation for each measurement - TASK 2 in Assignment
+df_Tidy <- mergedall %>% select(subject, activity_name, contains("mean"), contains("std"))
+
+##assign descriptive activity names - TASK 3 in Assignment
+df_Tidy$activity_name <- df_activities[df_Tidy$activity_name, 2]
+
+##assign appropirate descriptive variable names - TASK 4 in Assignment
+names(df_Tidy) <- gsub("Acc", "Accelermeter", names(df_Tidy))
+names(df_Tidy) <- gsub("Gyro", "Gyroscope", names(df_Tidy))
+names(df_Tidy) <- gsub("Mag", "Magnitude", names(df_Tidy))
+names(df_Tidy) <- gsub("^f", "Frequency", names(df_Tidy))
+names(df_Tidy) <- gsub("^t", "Time", names(df_Tidy))
+names(df_Tidy) <- gsub("tBody", "TimeBody", names(df_Tidy))
+
+##create a second, independent tidy data set with the average of each variable for each activity and each subject
+df_AvgData <- df_Tidy %>% 
+     group_by(subject, activity_name) %>% 
+       summarise_all(funs(mean))
+
+
+
+
+
+
+
+

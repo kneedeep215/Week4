@@ -1,0 +1,119 @@
+---
+title: "Codebook - Week 4 Assignment"
+author: "Chris B."
+date: "6/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Source Data Description
+The run_analysis.R script processes activity date provided in multiple files from the University of California Irvine Machine Learning Repository.
+
+A Zip file was downloaded from this URL: https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
+
+The Zip contained the following files:
+
+* features.txt - Provides a listing of the names of all measurements in the data set
+
+* activity_labels.txt - Provides a list of the six activity types
+
+* Three Test data sets - subject_test.txt, X-test.txt, Y_test.txt
+
+* Three Training dat sets - subject_train.txt, X-train.txt, Y_train.txt
+
+# Processing Steps
+## File Pointers
+Once the files were extracted from the Zip a file holder was assigned to point to the location of each of the extracted files. 
+These holder variables made referencing the files simpler in subsequent steps. 
+Each location started with:  
+**C:/Users/Chris/Documents/R/Week4Final/data/UCI HAR Dataset/**.  
+These variables were created to point to the associated files: 
+
+* UCIfeature: *features.txt*
+
+* UCIactivities: *activity_labels.txt*
+
+* UCIsubjtest: *subject_test.txt*
+
+* UCIXTest: *X_test.txt*
+
+* UCIYTest: *Y_test.txt*
+
+* UCIsubjtrain: *subject_train.txt*
+
+* UCIXTrain: *X_train.txt*
+
+* UCIYTrain: *Y_train.txt*
+
+## Data Frame creation
+Once all file pointers were created, a data frame was created for each so that the data in the files could be processed further.  
+The data frame variables are:  
+
+### global data frames
+
+*df_features: read the data in from the features.txt file
+
+*df_activities: read the data in from the activity_labels.txt file and assigned column headers 
+
+### test data frames
+
+*df_subjtest: read the data in from the subject_test.txt file
+
+*df_xtest: read the data in from the X_test.txt file
+
+*df_ytest: read the data in from the Y_test.txt file 
+
+### training data frames
+
+*df_subjtrain: read the data in from the subject_train.txt file
+
+*df_xtrain: read the data in from the X_train.txt file
+
+*df_ytrain: read the data in from the Y_train.txt file
+
+## Assignment Steps
+After all data frames were created and files were read, the assignment processing steps were conducted.
+
+### Step 1 - Merge Test and Training data sets into one data set
+For each of the three types of data set (X, Y, and subject), a merged data set was created to combing the test and train data frames together.  
+The following variables were created using the rbind function:  
+
+* mergedx: merged the df_xtest and df_xtrain data frames into a combined data frame for all "X" data
+
+* mergedy: merged the df_ytest and df_ytrain data frames into a combined data frame for all "Y" data
+
+* mergedsubj: merged the df_subjtest and df_subjtrain data frames into a combined data frame for all "subject" data  
+
+Finally the **mergedall** data frame was created to combind all of the "merged" data frames using the cbind function.  
+
+### Step 2 - Extract only the measurments on the mean and standard deviation for each measurement
+Now that all data sets have been merged into the **mergedall** data frame, we want to reduce the number of columns to only include those that have mean or standard deviation data in them.
+Using the "pipe" expression and a select statment, the new data frame called **df_Tidy** was created.  
+The select statment which was run against the merdgedall data frame is:  
+*select(subject, activity_name, contains("mean"), contains("std"))*  
+This selects only thoses records from the mergedall data frame which contain *mean* or *std* in the column name.  
+
+### Step 3 - Apply descriptive activity names to the activities in the data set
+This step was accomplished by simply assigning the values from the df_activities data frame, which included the six activities used to capture the original data to the activity_name field in the df_Tidy data frame.  
+
+### Step 4 - Appropriately label the data set with descriptive variable names
+This step was accomplished by using the **gsub** function to substitute more descriptive names to the columns in the df_Tidy data frame. The following substitutions were made:  
+
+|Original Text String | Replacement Value |
+|-------------------- |------------------ |
+|Acc                  | Accelermeter      |
+|Gyro                 | Gyroscope         |
+|Mag                  | Magnitude         |
+|^t (starts with t)   | Time              |
+|^f (starts with f)   | Frequency         |
+|tBody                | TimeBody          |  
+
+### Step 5 - From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject
+A new data frame called **df_AvgData** was created to capture the average of each variable when grouped by subject and activity name.  
+The new data frame was created by using the "pipe" expression and using the group_by and summarise_all functions from the dplyr package. The summarise_all function will be replaced by the across function but as of the time of this assignmen that version of dplyr was still in development. 
+
+
+
+
